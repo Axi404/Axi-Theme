@@ -70,7 +70,8 @@ const { friends } = friendsData
             <div class='grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 break-words'>
               {
                 (linksConf.applyTip || []).map(({ name, val }: { name: any, val: any }) => {
-                  const script = `navigator.clipboard.writeText('${val}');document.dispatchEvent(new CustomEvent('toast',{detail:{message:'Copied "${val}" to clipboard!'}}))`
+                  const safeVal = JSON.stringify(String(val ?? ''))
+                  const script = `navigator.clipboard.writeText(${safeVal});document.dispatchEvent(new CustomEvent('toast',{detail:{message:'Copied ' + ${safeVal} + ' to clipboard!'}}))`
                   return (
                     <>
                       <span class='text-sm font-medium text-muted-foreground text-end'>{name}:</span>
