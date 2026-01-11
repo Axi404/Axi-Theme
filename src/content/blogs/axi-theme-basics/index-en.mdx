@@ -1,0 +1,72 @@
+---
+title: "Axi Theme: Quick Start & Configuration"
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: Start locally, understand content structure, and configure your site via a single entry file.
+category: tech
+tags:
+  - axi-theme
+  - astro
+  - config
+language: en
+---
+
+## 1. Prerequisites
+
+- Node.js 18+ (recommended 20+)
+- Package manager: `pnpm`
+
+```bash
+pnpm install
+pnpm dev
+```
+
+## 2. Key Paths
+
+- `src/site.config.ts`: the main configuration entry (site info, nav, integrations)
+- `src/content/blogs/<slug>/index.mdx`: Chinese post
+- `src/content/blogs/<slug>/index-en.mdx`: English post (optional; if missing, English listing falls back to Chinese)
+- `public/`: static assets (`/images/*`, `/avatar/*`, etc.)
+
+## 3. Configure Your Site (`src/site.config.ts`)
+
+Common edits:
+
+- `theme.title` / `theme.description`
+- `theme.personal.domains.main` (used for absolute URLs, RSS, etc.)
+- `theme.header.menu`
+- `integ.pagefind` (search via Pagefind)
+- `integ.waline` (comments; see Waline doc)
+
+## 4. Create a Post (Bilingual)
+
+1) Create a folder: `src/content/blogs/my-first-post/`
+2) Write Chinese: `src/content/blogs/my-first-post/index.mdx`
+3) Write English: `src/content/blogs/my-first-post/index-en.mdx` (optional)
+
+Minimal frontmatter:
+
+```md
+---
+title: My Title
+publishDate: 2026-01-11
+description: Short summary.
+tags: ['docs']
+---
+```
+
+## 5. Build Output
+
+```bash
+pnpm build
+pnpm preview
+```
+
+- Output is generated into `dist/`
+- `astro.config.mjs` picks adapter/output based on `DEPLOYMENT_PLATFORM` (see deployment doc)
+
+## 6. Recommended Deployment (GitHub + Vercel)
+
+GitHub for source control + Vercel for CI/CD is the easiest path (previews, rollback, CDN, HTTPS).
+
+- Reference guide: [Website on Vercel](https://axi404.top/blog/website-vercel)

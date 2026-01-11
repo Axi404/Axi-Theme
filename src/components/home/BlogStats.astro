@@ -1,0 +1,85 @@
+---
+import { getBlogCollection, sortMDByDate } from '@/utils/server'
+import { getReadingTime } from '@/utils/reading-time'
+import { Icon } from '@/components/user'
+
+interface BlogStatsProps {
+  blogStartDate: Date
+}
+
+const { blogStartDate } = Astro.props as BlogStatsProps
+const startDate = blogStartDate
+
+const allPosts = await getBlogCollection()
+const sortedPosts = sortMDByDate(allPosts)
+
+const today = new Date()
+const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+
+const lastUpdated = sortedPosts.length > 0 ? 
+  new Date(sortedPosts[0].data.updatedDate || sortedPosts[0].data.publishDate) : 
+  new Date()
+
+let totalWords = 0
+for (const post of allPosts) {
+  try {
+    const { body } = post
+    if (body) {
+      const readingTime = getReadingTime(body)
+      totalWords += readingTime.words
+    }
+  } catch (error) {
+    console.warn(`Error calculating word count for post ${post.id}:`, error)
+  }
+}
+
+const formatNumber = (num: number) => {
+  if (num >= 10000) {
+    return Math.round(num / 1000) / 10 + 'w'
+  } else if (num >= 1000) {
+    return Math.round(num / 100) / 10 + 'k'
+  }
+  return num.toString()
+}
+
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+---
+
+<div class="flex flex-col gap-y-5">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="group flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:border-foreground/25 hover:shadow-lg">
+      <Icon name="time" class="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
+      <div class="text-center">
+        <div class="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">{daysDiff}</div>
+        <div class="text-sm text-muted-foreground">Days Online</div>
+      </div>
+    </div>
+    
+    <div class="group flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:border-foreground/25 hover:shadow-lg">
+      <Icon name="calendar" class="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
+      <div class="text-center">
+        <div class="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{formatDate(lastUpdated)}</div>
+        <div class="text-sm text-muted-foreground">Last Updated</div>
+      </div>
+    </div>
+    
+    <div class="group flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:border-foreground/25 hover:shadow-lg">
+      <Icon name="document" class="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
+      <div class="text-center">
+        <div class="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">{formatNumber(totalWords)}</div>
+        <div class="text-sm text-muted-foreground">Total Words</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="flex items-center justify-between text-sm border-t border-border pt-3">
+    <span class="text-muted-foreground">Total Posts</span>
+    <span class="font-medium text-foreground">{allPosts.length}</span>
+  </div>
+</div> 

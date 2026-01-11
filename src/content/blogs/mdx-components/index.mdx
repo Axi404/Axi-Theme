@@ -1,0 +1,64 @@
+---
+title: MDX 组件使用：User & Advanced
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: 文章内组件（Aside/Tabs 等）与高级组件（LinkPreview/GithubCard 等）的使用方式。
+category: tech
+tags:
+  - mdx
+  - components
+language: zh
+---
+
+import { Aside, Tabs, TabItem, Spoiler } from '@/components/user'
+import { GithubCard, LinkPreview, QRCode, ImageGroup, WebVideo } from '@/components/advanced'
+
+## 1. 必须使用 MDX
+
+`.md` 文章无法 `import` 组件；请使用 `.mdx`（如 `src/content/blogs/<slug>/index.mdx`）。
+
+## 2. User 组件示例
+
+<Aside type='tip' title='Tip'>
+你可以在 MDX 中直接使用主题组件。
+</Aside>
+
+<Tabs>
+  <TabItem label='A'>
+    A 面板内容
+  </TabItem>
+  <TabItem label='B'>
+    B 面板内容
+  </TabItem>
+</Tabs>
+
+<Spoiler label='点击展开'>
+隐藏内容写在这里。
+</Spoiler>
+
+## 3. Advanced 组件示例
+
+### GitHub 卡片
+
+<GithubCard repo='Axi404/Axi-Theme' />
+
+### 链接预览
+
+<LinkPreview href='https://astro.build/' />
+
+### 二维码
+
+<QRCode content='https://axi404.top/' class='mt-2' />
+
+### 图片组（等高拼图）
+
+<ImageGroup
+  images={[
+    { src: 'https://picr2.axi404.top/1767811093734_image.webp', alt: 'Image A', aspectRatio: 16 / 9 },
+    { src: 'https://picr2.axi404.top/1767811093734_image.webp', alt: 'Image B', aspectRatio: 1 },
+  ]}
+/>
+
+### 内嵌视频
+
+<WebVideo src='https://www.youtube.com/embed/dQw4w9WgXc' title='Video' />

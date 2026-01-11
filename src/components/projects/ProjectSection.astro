@@ -1,0 +1,144 @@
+---
+import type { ImageMetadata } from 'astro'
+import { Image } from 'astro:assets'
+
+import type { iconsType } from '@/types'
+import { Icon } from '@/components/user'
+
+interface Props {
+  class?: string
+  project: {
+    image?: string
+    name: string
+    description: string
+    links: {
+      type: string
+      href: string
+    }[]
+  }[]
+}
+const { class: className, project, ...props } = Astro.props
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/projects/*.{jpeg,jpg,png,gif,webp}'
+)
+const projectIconSet: Record<string, iconsType> = {
+  github: 'github-circle',
+  site: 'earth',
+  doc: 'document',
+  release: 'package'
+}
+---
+
+<div class={className} {...props}>
+  <div class='grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8'>
+    {
+      project.map((project, index) => {
+        var imagePath = null
+        if (project.image) {
+          imagePath = '/src/assets/projects/' + project.image
+          if (!images[imagePath])
+            throw new Error(
+              `"${imagePath}" does not exist in glob: "src/assets/projects/*.{jpeg,jpg,png,gif}"`
+            )
+        }
+
+        return (
+          <div 
+            class='project-card group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-500 hover:border-border hover:bg-card/50 hover:shadow-xl hover:shadow-primary/5'
+            style={`animation-delay: ${index * 100}ms`}
+          >
+            {/* Background gradient overlay */}
+            <div class='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
+            
+            {/* Image background */}
+            {imagePath && (
+              <div class='absolute inset-0 overflow-hidden'>
+                <Image
+                  class='h-full w-full object-cover opacity-0 blur-sm transition-all duration-700 group-hover:opacity-10 group-hover:blur-none group-hover:scale-110'
+                  src={images[imagePath]()}
+                  alt={project.name}
+                  loading='lazy'
+                />
+              </div>
+            )}
+            
+            {/* Content */}
+            <div class='relative z-10 flex h-full min-h-[200px] flex-col justify-between p-5 sm:p-6'>
+              {/* Header section */}
+              <div class='flex-1 space-y-3'>
+                <div class='flex items-start justify-between gap-4'>
+                  <a 
+                    href={project.links.find(link => link.type === 'site')?.href || project.links[0].href}
+                    target='_blank'
+                    class='group/title no-underline'
+                  >
+                    <h3 class='text-xl font-semibold tracking-tight text-foreground transition-colors group-hover/title:text-primary'>
+                      {project.name}
+                    </h3>
+                  </a>
+                  {imagePath && (
+                    <div class='flex-shrink-0 overflow-hidden rounded-lg border border-border/30 bg-background/60 p-1.5 backdrop-blur-sm transition-all duration-300 group-hover:border-primary/30 group-hover:bg-background/80'>
+                      <Image
+                        class='h-10 w-10 object-cover opacity-80 transition-opacity group-hover:opacity-100'
+                        src={images[imagePath]()}
+                        alt={project.name}
+                        loading='lazy'
+                      />
+                    </div>
+                  )}
+                </div>
+                
+                <p class='text-sm leading-relaxed text-muted-foreground transition-colors group-hover:text-foreground/80'>
+                  {project.description}
+                </p>
+              </div>
+              
+              {/* Footer section */}
+              <div class='mt-4 flex items-center gap-2 border-t border-border/30 pt-3'>
+                {project.links.map((link) => {
+                  const icon = projectIconSet[link.type]
+                  return (
+                    <a
+                      href={link.href}
+                      class='group/link flex items-center gap-1.5 rounded-full border border-border/40 bg-background/40 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-primary/10 hover:text-primary hover:shadow-md hover:shadow-primary/20'
+                      aria-label={link.type}
+                      target='_blank'
+                    >
+                      <Icon class='size-3.5 transition-transform group-hover/link:scale-110' name={icon} />
+                      <span class='capitalize'>{link.type}</span>
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
+            
+            {/* Decorative corner accent */}
+            <div class='absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100' />
+          </div>
+        )
+      })
+    }
+  </div>
+</div>
+
+<style>
+  .project-card {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Add smooth transitions for all interactive elements */
+  .project-card * {
+    /* Shorter transition duration for faster response */
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+</style>

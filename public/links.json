@@ -1,0 +1,16 @@
+{
+  "friends": [
+    {
+      "id_name": "example-links",
+      "desc": "示例友链",
+      "link_list": [
+        {
+          "name": "示例博客",
+          "link": "https://example.com",
+          "avatar": "https://example.com/avatar.png",
+          "intro": "这是一个示例博客介绍"
+        }
+      ]
+    }
+  ]
+}

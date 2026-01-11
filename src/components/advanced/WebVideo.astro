@@ -1,0 +1,6 @@
+---
+const { src, title, width = '100%', height = '468px' } = Astro.props
+---
+
+<iframe width={width} height={height} src={src} title={title} allowfullscreen style={{borderRadius: '10px', overflow: 'hidden'}}></iframe>
+

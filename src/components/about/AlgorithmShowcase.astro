@@ -1,0 +1,480 @@
+---
+// 算法展示容器组件 - 支持翻页展示多个算法
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`algorithm-showcase ${className}`}>
+  <div class="showcase-header">
+    <h3 id="current-title">Boids Algorithm</h3>
+    <div class="showcase-controls">
+      <button id="prev-btn" class="nav-btn" aria-label="上一个算法">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15,18 9,12 15,6"></polyline>
+        </svg>
+      </button>
+      <div class="indicator-dots" id="indicator-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <button id="next-btn" class="nav-btn" aria-label="下一个算法">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9,18 15,12 9,6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+  
+  <div class="showcase-content">
+    <div class="showcase-slider" id="showcase-slider">
+      <!-- Boids Algorithm -->
+      <div class="showcase-slide active" data-title="Boids Algorithm">
+        <div class="boids-showcase">
+          <canvas id="boidsCanvas"></canvas>
+        </div>
+      </div>
+      
+      <!-- Cellular Automata - Conway's Game of Life -->
+      <div class="showcase-slide" data-title="Game of Life">
+        <div class="cellular-automata-showcase">
+          <canvas id="cellularAutomataCanvas"></canvas>
+        </div>
+      </div>
+      
+      <!-- A* Pathfinding Algorithm -->
+      <div class="showcase-slide" data-title="Pathfinding">
+        <div class="astar-showcase">
+          <canvas id="astarCanvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .algorithm-showcase {
+    width: 100%;
+    margin: 2rem 0;
+  }
+
+  .showcase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .showcase-header h3 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #64748b;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .showcase-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+    color: #334155;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-btn:disabled:hover {
+    background: rgba(255, 255, 255, 0.8);
+    color: #64748b;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .indicator-dots {
+    display: flex;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .dot.active {
+    background: #3b82f6;
+    transform: scale(1.2);
+  }
+
+  .dot:hover:not(.active) {
+    background: #94a3b8;
+    transform: scale(1.1);
+  }
+
+  .showcase-content {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    background: transparent;
+  }
+
+  .showcase-slider {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .showcase-slide {
+    width: 100%;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .showcase-slide.active {
+    opacity: 1;
+  }
+
+  .boids-showcase {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  #boidsCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .cellular-automata-showcase {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  #cellularAutomataCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: pointer;
+  }
+
+  .astar-showcase {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  #astarCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+
+  .placeholder-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px dashed #cbd5e1;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .placeholder-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+
+  .placeholder-content h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #475569;
+  }
+
+  .placeholder-content p {
+    margin: 0 0 1rem 0;
+    color: #64748b;
+    font-size: 1rem;
+  }
+
+  .coming-soon {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .showcase-header {
+      flex-direction: row;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .showcase-header h3 {
+      font-size: 0.8rem;
+    }
+
+    .showcase-controls {
+      gap: 0.75rem;
+    }
+
+    .boids-showcase {
+      height: 400px;
+      border-radius: 20px;
+    }
+
+    .cellular-automata-showcase {
+      height: 400px;
+      border-radius: 20px;
+    }
+
+    .astar-showcase {
+      height: 400px;
+      border-radius: 20px;
+    }
+
+    .placeholder-content {
+      height: 400px;
+      border-radius: 20px;
+    }
+  }
+</style>
+
+<script>
+  // 导入算法模块
+  import { BoidsSystem } from './algorithms/BoidsAlgorithm.ts';
+  import { CellularAutomata } from './algorithms/CellularAutomata.ts';
+  import { AStar } from './algorithms/AStar.ts';
+
+  // 翻页展示逻辑
+  class AlgorithmShowcase {
+    currentIndex: number = 0;
+    slides!: NodeListOf<Element>;
+    dots!: NodeListOf<Element>;
+    slider!: HTMLElement;
+    title!: HTMLElement;
+    prevBtn!: HTMLElement;
+    nextBtn!: HTMLElement;
+    boidsSystem: BoidsSystem | null = null;
+    cellularAutomata: CellularAutomata | null = null;
+    astar: AStar | null = null;
+
+    titles = ["Boids Algorithm", "Game of Life", "Pathfinding"];
+
+    constructor() {
+      this.initializeElements();
+      this.setupEventListeners();
+      this.updateDisplay();
+      this.initializeBoids();
+    }
+
+    initializeElements(): void {
+      this.slides = document.querySelectorAll('.showcase-slide');
+      this.dots = document.querySelectorAll('.dot');
+      this.slider = document.getElementById('showcase-slider')!;
+      this.title = document.getElementById('current-title')!;
+      this.prevBtn = document.getElementById('prev-btn')!;
+      this.nextBtn = document.getElementById('next-btn')!;
+    }
+
+    setupEventListeners(): void {
+      this.prevBtn.addEventListener('click', () => this.previousSlide());
+      this.nextBtn.addEventListener('click', () => this.nextSlide());
+      
+      this.dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => this.goToSlide(index));
+      });
+    }
+
+    previousSlide(): void {
+      if (this.currentIndex > 0) {
+        this.currentIndex--;
+        this.updateDisplay();
+      }
+    }
+
+    nextSlide(): void {
+      if (this.currentIndex < this.slides.length - 1) {
+        this.currentIndex++;
+        this.updateDisplay();
+      }
+    }
+
+    goToSlide(index: number): void {
+      if (index >= 0 && index < this.slides.length) {
+        this.currentIndex = index;
+        this.updateDisplay();
+      }
+    }
+
+    updateDisplay(): void {
+      // 更新滑块位置
+      this.slider.style.transform = `translateX(-${this.currentIndex * 100}%)`;
+      
+      // 更新活动状态
+      this.slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === this.currentIndex);
+      });
+      
+      this.dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === this.currentIndex);
+      });
+      
+      // 更新标题
+      this.title.textContent = this.titles[this.currentIndex];
+      
+      // 更新按钮状态
+      (this.prevBtn as HTMLButtonElement).disabled = this.currentIndex === 0;
+      (this.nextBtn as HTMLButtonElement).disabled = this.currentIndex === this.slides.length - 1;
+      
+      // 处理算法系统
+      if (this.currentIndex === 0) {
+        // Boids 算法
+        if (!this.boidsSystem) {
+          this.initializeBoids();
+        }
+        this.destroyOtherSystems(['boids']);
+      } else if (this.currentIndex === 1) {
+        // 元胞自动机
+        if (!this.cellularAutomata) {
+          this.initializeCellularAutomata();
+        }
+        this.destroyOtherSystems(['cellular']);
+      } else if (this.currentIndex === 2) {
+        // A* 寻路算法
+        if (!this.astar) {
+          this.initializeAStar();
+        }
+        this.destroyOtherSystems(['astar']);
+      } else {
+        // 其他算法或占位符
+        this.destroyOtherSystems([]);
+      }
+    }
+
+    initializeBoids(): void {
+      const canvas = document.getElementById('boidsCanvas') as HTMLCanvasElement;
+      if (canvas && this.currentIndex === 0) {
+        this.boidsSystem = new BoidsSystem(canvas);
+      }
+    }
+
+    initializeCellularAutomata(): void {
+      const canvas = document.getElementById('cellularAutomataCanvas') as HTMLCanvasElement;
+      if (canvas && this.currentIndex === 1) {
+        this.cellularAutomata = new CellularAutomata(canvas, {
+          cellSize: 12,
+          updateInterval: 1000,
+          density: 0.25,
+          colors: {
+            alive: '#64748b',
+            dead: 'transparent',
+            grid: 'rgba(203, 213, 225, 0.15)'
+          }
+        });
+      }
+    }
+
+    initializeAStar(): void {
+      const canvas = document.getElementById('astarCanvas') as HTMLCanvasElement;
+      if (canvas && this.currentIndex === 2) {
+        this.astar = new AStar(canvas, {
+          gridSize: 20,
+          animationSpeed: 50,
+          allowDiagonal: false,
+          colors: {
+            wall: '#475569',
+            start: '#10b981',
+            end: '#ef4444',
+            path: '#3b82f6',
+            visited: 'rgba(239, 68, 68, 0.2)',
+            current: '#f59e0b',
+            open: 'rgba(16, 185, 129, 0.2)',
+            grid: 'rgba(203, 213, 225, 0.25)'
+          }
+        });
+        
+        // 自动开始寻路
+        setTimeout(() => {
+          if (this.astar) {
+            this.astar.startPathfinding();
+          }
+        }, 500);
+      }
+    }
+
+    destroyOtherSystems(keep: string[]): void {
+      if (!keep.includes('boids') && this.boidsSystem) {
+        this.boidsSystem.destroy();
+        this.boidsSystem = null;
+      }
+      if (!keep.includes('cellular') && this.cellularAutomata) {
+        this.cellularAutomata.destroy();
+        this.cellularAutomata = null;
+      }
+      if (!keep.includes('astar') && this.astar) {
+        this.astar.destroy();
+        this.astar = null;
+      }
+    }
+  }
+
+  // 初始化
+  document.addEventListener('DOMContentLoaded', () => {
+    new AlgorithmShowcase();
+  });
+</script>

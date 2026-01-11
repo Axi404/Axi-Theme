@@ -1,0 +1,57 @@
+---
+title: "Writing Guide: Markdown / MDX"
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: Supported Markdown extensions, KaTeX math, Shiki code features, and when to use MDX.
+category: tech
+tags:
+  - markdown
+  - mdx
+  - writing
+language: en
+---
+
+## 1. Markdown Features
+
+Enabled by default:
+
+- GFM: tables, strikethrough, task lists
+- Math: KaTeX (`$...$` / `$$...$$`)
+- Code highlighting: Shiki (titles, diff/highlight notations)
+
+## 2. Math (KaTeX)
+
+Inline:
+
+```md
+Euler: $e^{i\\pi}+1=0$
+```
+
+Block:
+
+```md
+$$
+\\int_0^1 x^2 dx = \\frac{1}{3}
+$$
+```
+
+## 3. Code Notations (diff / highlight)
+
+Diff-like markers (powered by the theme's Shiki transformers):
+
+```ts
+const a = 1 // [!code --]
+const a = 2 // [!code ++]
+```
+
+Highlight:
+
+```ts
+const token = 'secret' // [!code highlight]
+```
+
+## 4. When to Use MDX
+
+Use `.mdx` when you want to import and render components inside content (e.g. `Aside`, `Tabs`, `GithubCard`).
+
+See the “MDX Components” doc for examples.

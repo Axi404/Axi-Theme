@@ -1,0 +1,65 @@
+---
+title: GitHub + Vercel 部署（推荐）
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: 使用 GitHub 管理代码，并用 Vercel 自动构建与部署（含环境变量与常见坑）。
+category: tech
+tags:
+  - deployment
+  - vercel
+  - github
+language: zh
+---
+
+## 1. 为什么推荐 GitHub + Vercel
+
+- PR 预览：每个分支/PR 都能拿到可访问的预览链接
+- 自动构建：push 即部署
+- HTTPS / CDN：默认就有
+
+详细流程与说明：[Website on Vercel](https://axi404.top/blog/website-vercel)
+
+## 2. 部署前检查
+
+本地先跑通：
+
+```bash
+pnpm install
+pnpm build
+```
+
+配置域名（建议至少填主域名）：
+
+- `src/site.config.ts` → `theme.personal.domains.main`
+
+## 3. Vercel 部署要点
+
+主题会读取 `DEPLOYMENT_PLATFORM` 来选择适配器与输出：
+
+- `vercel`（默认）：Vercel adapter，输出通常为 `server`
+- `github`：用于 GitHub Pages，输出为 `static`
+- `cloudflare`：用于 Cloudflare Pages，输出为 `static`
+
+在 Vercel 项目里设置环境变量：
+
+```txt
+DEPLOYMENT_PLATFORM=vercel
+```
+
+构建命令建议使用：
+
+```txt
+pnpm build
+```
+
+输出目录（Output Directory）保持默认即可（Astro 会由适配器处理）。
+
+## 4. 静态站点（可选）
+
+如果你希望生成纯静态站点（例如 GitHub Pages），使用：
+
+```txt
+DEPLOYMENT_PLATFORM=github
+```
+
+并确保你的部署平台支持静态产物 `dist/`。

@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets'
+import type { CollectionEntry } from 'astro:content'
+import { cn } from '@/utils'
+
+interface Props {
+  collection: CollectionEntry<'postCollections'>
+  class?: string
+}
+
+const { collection, class: className } = Astro.props
+const { data } = collection
+
+const isEn = Astro.currentLocale === 'en'
+const title = isEn && data.title_en ? data.title_en : data.title
+const description = isEn && data.description_en ? data.description_en : data.description
+
+const imageProps = data.heroImage ? {
+  src: data.heroImage.src,
+  alt: data.heroImage.alt || title,
+  width: data.heroImage.width || 1200,
+  height: data.heroImage.height || 630
+} : undefined
+---
+
+<div class={cn('mb-8 animate', className)}>
+  {
+    imageProps ? (
+      <div class='group relative overflow-hidden rounded-xl shadow-sm'>
+        <Image
+          src={imageProps.src}
+          alt={imageProps.alt}
+          width={imageProps.width}
+          height={imageProps.height}
+          class='h-auto w-full object-cover max-h-[400px] transition-all'
+        />
+        <div class='absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent p-6'>
+          <h1 class='mb-2 text-3xl font-bold text-white'>{title}</h1>
+          {description && <p class='line-clamp-2 text-white/90'>{description}</p>}
+        </div>
+      </div>
+    ) : (
+      <>
+        <h1 class='mb-2 text-3xl'>{title}</h1>
+        {description && <p class='text-muted-foreground'>{description}</p>}
+      </>
+    )
+  }
+</div>

@@ -1,0 +1,134 @@
+---
+import PageLayout from '@/layouts/CommonPage.astro'
+import {
+  Button,
+  Icon,
+  PublicationSection,
+  ResearchProjectSection,
+  SimpleIcon
+} from '@/components/user'
+import config from '@/site-config'
+
+const headings = [
+  { depth: 2, slug: 'about-me', text: 'About Me' },
+  { depth: 2, slug: 'research-interests', text: 'Research Interests' },
+  { depth: 2, slug: 'publications', text: 'Publications' },
+  { depth: 2, slug: 'open-source-projects', text: 'Open-source Projects' }
+]
+---
+
+<PageLayout title='Academic' {headings} info={{ slug: '/academic', hideComment: true }}>
+  <h2 id='about-me'>About Me<a class='anchor' href='#about-me'>#</a></h2>
+  <p>
+    Introduce your academic background here. For example: I am an undergraduate/graduate student at [University Name], currently interning or studying at [Lab Name], supervised by Professor [Professor Name]. My research interest is [Research Interest].
+  </p>
+
+  <p>My research philosophy: Write your perspective and attitude towards research here.</p>
+  <p>
+    You can describe your research motivation, goals, and specific problems you are currently focusing on in detail.
+  </p>
+
+  <p>Here is my academic CV, feel free to download it.</p>
+  <Button title='Download CV' class='w-fit' href='#' target='_blank'>
+    <Icon class='size-5' name='download' slot='before' />
+  </Button>
+  <h2 id='research-interests'>
+    Research Interests<a class='anchor' href='#research-interests'>#</a>
+  </h2>
+  <div class='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+    {
+      [
+        {
+          title: 'Research Interest 1',
+          description: 'Detailed description of this research interest, including keywords, etc.',
+          icon: 'ros'
+        },
+        {
+          title: 'Research Interest 2',
+          description: 'Detailed description of this research interest, including keywords, etc.',
+          icon: 'pytorch'
+        }
+      ].map((interest) => (
+        <div class='group relative overflow-hidden rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/25 hover:shadow-md'>
+          <div class='flex items-start gap-4'>
+            <div class='flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20'>
+              <SimpleIcon
+                class='size-5 text-primary transition-transform duration-300 group-hover:scale-110'
+                name={interest.icon}
+              />
+            </div>
+            <div class='flex-1'>
+              <p class='text-xl font-medium leading-tight text-foreground transition-colors group-hover:text-primary'>
+                {interest.title}
+              </p>
+              <p class='text-sm leading-relaxed text-muted-foreground'>{interest.description}</p>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+  <h2 id='publications'>Publications<a class='anchor' href='#publications'>#</a></h2>
+  <PublicationSection
+    publications={[
+      {
+        title:
+          'Paper Title: Enter your paper title here',
+        authors: [
+          { name: 'Author 1', isEqual: true },
+          { name: 'Author 2', isMe: true },
+          { name: 'Author 3', isCoreContributor: true }
+        ],
+        venue: 'Conference or Journal Name (e.g., CVPR, ECCV)',
+        year: '202X',
+        type: 'conference',
+        abstract:
+          'Enter the paper abstract here. Briefly introduce the research background, methodology, and main contributions of the paper.',
+        links: [
+          { type: 'website', href: '#' },
+          { type: 'arxiv', href: '#' }
+        ],
+        status: 'published'
+      }
+    ]}
+  />
+  <h2 id='open-source-projects'>
+    Open-source Projects<a class='anchor' href='#open-source-projects'>#</a>
+  </h2>
+  <ResearchProjectSection
+    projects={[
+      {
+        title: 'Project Name',
+        description:
+          'Project Description: Briefly introduce the function and purpose of this open-source project.',
+        category: 'Project Category',
+        status: 'active',
+        links: [
+          { type: 'github', href: '#', label: 'Code' }
+        ]
+      }
+    ]}
+  />
+</PageLayout>
+
+<script
+  is:inline
+  type='module'
+  data-astro-rerun
+  define:vars={{ npmCDN: config.npmCDN, walineServer: config.integ.waline.server }}
+>
+  const normalizePath = (path) => {
+    if (path === '/') return path
+    return path.endsWith('/') ? path.slice(0, -1) : path
+  }
+
+  const loadPageviewCount = async () => {
+    const pageview = await import(`${npmCDN}/@waline/client@v3/dist/pageview.js`)
+    pageview.pageviewCount({
+      serverURL: walineServer,
+      path: normalizePath(window.location.pathname)
+    })
+  }
+
+  await loadPageviewCount()
+</script>

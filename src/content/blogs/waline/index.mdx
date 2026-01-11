@@ -1,0 +1,46 @@
+---
+title: Waline 评论系统：部署与接入
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: 部署 Waline 服务端，并在 Axi Theme 中启用评论与访问量统计。
+category: tech
+tags:
+  - waline
+  - comments
+  - deployment
+language: zh
+---
+
+## 1. 部署 Waline 服务端
+
+请参考这篇完整教程（包含服务端部署与配置项说明）：
+
+- [Waline Comments: Deploy & Integrate](https://axi404.top/blog/waline-install)
+
+部署完成后你会得到一个服务端地址，例如：
+
+```txt
+https://waline.example.com/
+```
+
+## 2. 在主题中启用 Waline
+
+编辑 `src/site.config.ts`：
+
+- `integ.waline.enable`: 设为 `true`
+- `integ.waline.server`: 填你的 Waline Server URL
+
+示例：
+
+```ts
+waline: {
+  enable: true,
+  server: 'https://waline.example.com/',
+}
+```
+
+## 3. 常见说明
+
+- 评论区组件：`src/components/advanced/Comment.astro`
+- 页面访问量/评论数：部分页面会加载 Waline 的 `pageview` 统计（见 `src/pages/*`）
+- 单篇文章是否显示评论：由文章 Frontmatter 的 `comment` 控制（默认 `true`）

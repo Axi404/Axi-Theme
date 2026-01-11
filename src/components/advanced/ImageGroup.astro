@@ -1,0 +1,65 @@
+---
+import sharp from 'sharp'
+
+interface ImageItem {
+  src: string
+  alt?: string
+  aspectRatio?: number
+}
+
+interface Props {
+  images: (string | ImageItem)[]
+  gap?: number
+  aspectRatio?: number
+}
+
+const { images, gap = 12, aspectRatio: commonAR } = Astro.props
+
+const items = await Promise.all(
+  images.map(async (img) => {
+    const isString = typeof img === 'string'
+    const src = isString ? img : img.src
+    const alt = isString ? '' : img.alt
+    let ar = isString ? commonAR : (img.aspectRatio || commonAR)
+
+    if (!ar && src.startsWith('http')) {
+      try {
+        const response = await fetch(src)
+        const buffer = await response.arrayBuffer()
+        const metadata = await sharp(Buffer.from(buffer)).metadata()
+        if (metadata.width && metadata.height) {
+          ar = metadata.width / metadata.height
+        }
+      } catch (e) {
+        console.warn(`[ImageGroup] Failed to detect aspect ratio for ${src}`, e)
+      }
+    }
+
+    return {
+      src,
+      alt,
+      aspectRatio: ar || 1, // Fallback to 1 (square) if detection fails
+    }
+  }),
+)
+---
+
+<div class="image-group flex w-full" style={`gap: ${gap}px`}>
+  {
+    items.map((img) => {
+      // flex-grow is proportional to aspect ratio
+      const flexStyle = `flex: ${img.aspectRatio} 1 0%`
+
+      return (
+        <div style={flexStyle} class="relative flex items-center justify-center overflow-hidden">
+          <img
+            src={img.src}
+            alt={img.alt || ''}
+            class="block w-full h-auto"
+            style={{ aspectRatio: img.aspectRatio }}
+          />
+        </div>
+      )
+    })
+  }
+</div>

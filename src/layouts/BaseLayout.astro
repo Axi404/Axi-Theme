@@ -1,0 +1,522 @@
+---
+import BaseHead from '@/components/BaseHead.astro'
+import config from '@/site-config'
+
+import { Footer, Header, ThemeProvider } from '@/components/basic'
+import type { SiteMeta } from '@/types'
+// Import the global.css file here so that it is included on
+// all pages through the use of the <BaseLayout /> component.
+import '@/assets/styles/app.css'
+
+interface Props {
+  meta: SiteMeta
+  highlightColor?: string
+}
+
+const {
+  meta: { articleDate, description = config.description, ogImage, title },
+  highlightColor
+} = Astro.props
+
+const currentLocale = Astro.currentLocale || 'zh'
+const langAttr = currentLocale === 'en' ? 'en' : 'zh'
+---
+
+<html lang={langAttr}>
+  <head>
+    <BaseHead {articleDate} {description} {ogImage} {title} />
+    <ThemeProvider />
+    <!-- Google tag (gtag.js) -->
+    <script is:inline async src='https://www.googletagmanager.com/gtag/js?id=G-23SWRT8LTH'></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || []
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag('js', new Date())
+
+      gtag('config', 'G-23SWRT8LTH')
+    </script>
+  </head>
+
+  <body class='flex justify-center bg-background'>
+    <!-- <div
+      id='gradient-background'
+      class='pointer-events-none fixed h-screen w-screen blur-2xl transition-opacity duration-1000'
+    >
+      <div
+        class='absolute right-[25%] top-[-90%] h-full w-[75%] rounded-full bg-gradient-to-b from-blue-300 via-pink-300 to-transparent opacity-40 dark:opacity-25'
+      >
+      </div>
+      <div
+        class='absolute left-[25%] top-[-90%] h-full w-[75%] rounded-full bg-gradient-to-b from-blue-300 via-pink-300 to-transparent opacity-40 dark:opacity-25'
+      >
+      </div>
+      <div
+        class='absolute right-[25%] top-[-85%] h-full w-[55%] rounded-full bg-gradient-to-b from-purple-300 via-blue-300 to-transparent opacity-40 dark:opacity-25'
+      >
+      </div>
+      <div
+        class='absolute left-[25%] top-[-85%] h-full w-[55%] rounded-full bg-gradient-to-b from-indigo-300 via-orange-300 to-transparent opacity-40 dark:opacity-25'
+      >
+      </div>
+      <div
+        class='absolute left-[-25%] top-[-75%] h-full w-[65%] rounded-full bg-gradient-to-b from-blue-300 via-pink-300 to-transparent opacity-30 dark:opacity-20'
+      >
+      </div>
+      <div
+        class='absolute right-[-25%] top-[-75%] h-full w-[65%] rounded-full bg-gradient-to-b from-purple-300 via-blue-300 to-transparent opacity-30 dark:opacity-20'
+      >
+      </div>
+      <div
+        class='absolute left-[-30%] top-[-85%] h-full w-[85%] rounded-full bg-gradient-to-b from-indigo-300 via-orange-300 to-transparent opacity-60 dark:opacity-30'
+      >
+      </div>
+      <div
+        class='absolute right-[-30%] top-[-85%] h-full w-[85%] rounded-full bg-gradient-to-b from-orange-300 via-indigo-300 to-transparent opacity-60 dark:opacity-30'
+      >
+      </div>
+    </div> -->
+
+    {
+      highlightColor && (
+        <div
+          id='highlight-gradient'
+          class='pointer-events-none absolute start-0 top-0 z-0 h-screen w-full opacity-25'
+          style={`background-image:linear-gradient(${highlightColor},transparent)`}
+        />
+      )
+    }
+    <div class='w-full max-w-[70rem] px-4 sm:px-7 lg:px-10'>
+      <Header />
+      <slot />
+      <Footer />
+    </div>
+
+    {/* Set highlight color */}
+    <style define:vars={{ highlightColor }}>
+      :global(.highlight) {
+        color: var(--highlightColor, hsl(var(--primary) / var(--tw-text-opacity))) !important;
+      }
+      :global(.highlight-bg) {
+        background-color: var(
+          --highlightColor,
+          hsl(var(--primary) / var(--tw-text-opacity))
+        ) !important;
+      }
+
+      /* 点击粒子效果样式 */
+      :global(.click-particle) {
+        position: fixed;
+        pointer-events: none;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        z-index: 9999;
+        animation: particle-explosion 1.1s ease-out forwards;
+        box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+      }
+
+      /* 暗色主题下的粒子效果 */
+      :global(.dark .click-particle) {
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+      }
+
+      @keyframes particle-explosion {
+        0% {
+          opacity: 1;
+          transform: scale(0.4) translate(0, 0);
+        }
+        15% {
+          opacity: 1;
+          transform: scale(1.3) translate(var(--dx), var(--dy));
+        }
+        60% {
+          opacity: 0.8;
+          transform: scale(1) translate(calc(var(--dx) * 2.5), calc(var(--dy) * 2.5));
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.3) translate(calc(var(--dx) * 3.5), calc(var(--dy) * 3.5));
+        }
+      }
+
+      /* 亮色主题粒子颜色 */
+      :global(.click-particle.color-1) {
+        background: #ffc1cc;
+        background: radial-gradient(circle, #ffb3ba 0%, #ffc1cc 100%);
+      }
+
+      :global(.click-particle.color-2) {
+        background: #bde4ff;
+        background: radial-gradient(circle, #a8d8ff 0%, #bde4ff 100%);
+      }
+
+      :global(.click-particle.color-3) {
+        background: #fff2a8;
+        background: radial-gradient(circle, #ffe66d 0%, #fff2a8 100%);
+      }
+
+      :global(.click-particle.color-4) {
+        background: #e6ccff;
+        background: radial-gradient(circle, #d4a5ff 0%, #e6ccff 100%);
+      }
+
+      :global(.click-particle.color-5) {
+        background: #c1ffc1;
+        background: radial-gradient(circle, #a8e6a8 0%, #c1ffc1 100%);
+      }
+
+      :global(.click-particle.color-6) {
+        background: #ffd4a3;
+        background: radial-gradient(circle, #ffcc99 0%, #ffd4a3 100%);
+      }
+
+      :global(.click-particle.color-7) {
+        background: #c4e8ff;
+        background: radial-gradient(circle, #b3deff 0%, #c4e8ff 100%);
+      }
+
+      :global(.click-particle.color-8) {
+        background: #f8d7da;
+        background: radial-gradient(circle, #f5c2c7 0%, #f8d7da 100%);
+      }
+
+      :global(.click-particle.color-9) {
+        background: #d1f2d1;
+        background: radial-gradient(circle, #c3e6c3 0%, #d1f2d1 100%);
+      }
+
+      :global(.click-particle.color-10) {
+        background: #fff0d4;
+        background: radial-gradient(circle, #ffe8b3 0%, #fff0d4 100%);
+      }
+
+      /* 暗色主题粒子颜色 - 更深更鲜艳 */
+      :global(.dark .click-particle.color-1) {
+        background: #ff6b8a;
+        background: radial-gradient(circle, #ff4757 0%, #ff6b8a 100%);
+      }
+
+      :global(.dark .click-particle.color-2) {
+        background: #4fc3f7;
+        background: radial-gradient(circle, #29b6f6 0%, #4fc3f7 100%);
+      }
+
+      :global(.dark .click-particle.color-3) {
+        background: #ffd54f;
+        background: radial-gradient(circle, #ffca28 0%, #ffd54f 100%);
+      }
+
+      :global(.dark .click-particle.color-4) {
+        background: #ba68c8;
+        background: radial-gradient(circle, #ab47bc 0%, #ba68c8 100%);
+      }
+
+      :global(.dark .click-particle.color-5) {
+        background: #81c784;
+        background: radial-gradient(circle, #66bb6a 0%, #81c784 100%);
+      }
+
+      :global(.dark .click-particle.color-6) {
+        background: #ffb74d;
+        background: radial-gradient(circle, #ffa726 0%, #ffb74d 100%);
+      }
+
+      :global(.dark .click-particle.color-7) {
+        background: #64b5f6;
+        background: radial-gradient(circle, #42a5f5 0%, #64b5f6 100%);
+      }
+
+      :global(.dark .click-particle.color-8) {
+        background: #f48fb1;
+        background: radial-gradient(circle, #f06292 0%, #f48fb1 100%);
+      }
+
+      :global(.dark .click-particle.color-9) {
+        background: #a5d6a7;
+        background: radial-gradient(circle, #81c784 0%, #a5d6a7 100%);
+      }
+
+      :global(.dark .click-particle.color-10) {
+        background: #ffe082;
+        background: radial-gradient(circle, #ffd54f 0%, #ffe082 100%);
+      }
+
+      /* 图形加速检测弹窗样式 */
+      :global(.graphics-warning-overlay) {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+        opacity: 0;
+        animation: fadeIn 0.4s ease-out forwards;
+      }
+
+      :global(.graphics-warning-dialog) {
+        background: hsl(var(--background));
+        color: hsl(var(--foreground));
+        padding: 32px;
+        border-radius: 20px;
+        max-width: 520px;
+        margin: 20px;
+        box-shadow:
+          0 20px 50px rgba(0, 0, 0, 0.3),
+          0 0 0 1px hsl(var(--border) / 0.1);
+        backdrop-filter: blur(20px);
+        transform: translateY(20px) scale(0.95);
+        animation: slideUp 0.4s ease-out 0.1s forwards;
+        border: 1px solid hsl(var(--border) / 0.2);
+      }
+
+      :global(.dark .graphics-warning-dialog) {
+        box-shadow:
+          0 20px 50px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+      }
+
+      :global(.graphics-warning-header) {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 16px;
+      }
+
+      :global(.graphics-warning-icon) {
+        font-size: 32px;
+        background: linear-gradient(135deg, #f59e0b, #f97316);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
+      }
+
+      :global(.graphics-warning-icon.error) {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.3));
+      }
+
+      :global(.graphics-warning-title) {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        background: linear-gradient(135deg, hsl(var(--foreground)), hsl(var(--foreground) / 0.8));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      :global(.graphics-warning-content) {
+        line-height: 1.7;
+        margin-bottom: 28px;
+        color: hsl(var(--muted-foreground));
+        font-size: 15px;
+      }
+
+      :global(.graphics-warning-content strong) {
+        color: hsl(var(--foreground));
+        font-weight: 600;
+      }
+
+      :global(.graphics-warning-list) {
+        margin: 16px 0;
+        padding-left: 0;
+        list-style: none;
+      }
+
+      :global(.graphics-warning-list li) {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 8px;
+        color: hsl(var(--muted-foreground));
+      }
+
+      :global(.graphics-warning-list li::before) {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: hsl(var(--primary));
+        font-weight: bold;
+      }
+
+      :global(.graphics-warning-actions) {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+
+      :global(.graphics-warning-btn) {
+        background: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      :global(.graphics-warning-btn::before) {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+      }
+
+      :global(.graphics-warning-btn:hover::before) {
+        left: 100%;
+      }
+
+      :global(.graphics-warning-btn:hover) {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px hsl(var(--primary) / 0.3);
+      }
+
+      :global(.graphics-warning-btn:active) {
+        transform: translateY(0);
+      }
+
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        to {
+          transform: translateY(0) scale(1);
+        }
+      }
+    </style>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('click', (e) => {
+          const target = e.target as HTMLElement
+          const link = target.closest('a[href^="#"]') as HTMLAnchorElement
+
+          if (!link) return
+
+          if (link.closest('toc-heading')) return
+
+          const href = link.getAttribute('href')
+          if (!href || href === '#') return
+
+          const targetId = href.substring(1)
+          const targetElement = document.getElementById(targetId)
+
+          if (!targetElement) return
+
+          e.preventDefault()
+
+          history.pushState(null, '', href)
+
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          })
+        })
+      })
+    </script>
+
+    <!-- <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const originalTitle = document.title
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            document.title = 'ฅ^•ﻌ•^ฅ 主人快回来吧~'
+          } else {
+            document.title = originalTitle
+          }
+        })
+        window.addEventListener('blur', () => {
+          document.title = 'ฅ^•ﻌ•^ฅ 主人快回来吧~'
+        })
+        window.addEventListener('focus', () => {
+          document.title = originalTitle
+        })
+      })
+    </script> -->
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        function createParticle(
+          x: number,
+          y: number,
+          angle: number,
+          distance: number,
+          colorIndex: number
+        ) {
+          const particle = document.createElement('div')
+          particle.className = `click-particle color-${colorIndex}`
+          const dx = Math.cos(angle) * distance
+          const dy = Math.sin(angle) * distance
+          particle.style.setProperty('--dx', dx + 'px')
+          particle.style.setProperty('--dy', dy + 'px')
+          particle.style.left = x + 'px'
+          particle.style.top = y + 'px'
+          const size = Math.random() * 6 + 8
+          particle.style.width = size + 'px'
+          particle.style.height = size + 'px'
+          document.body.appendChild(particle)
+          setTimeout(() => {
+            if (particle.parentNode) {
+              particle.parentNode.removeChild(particle)
+            }
+          }, 1100)
+        }
+        document.addEventListener('click', (e) => {
+          const particleCount = 10
+          const baseDistance = 18
+          for (let i = 0; i < particleCount; i++) {
+            const angle = ((Math.PI * 2) / particleCount) * i
+            const distance = baseDistance + Math.random() * 8
+            const colorIndex = (i % 10) + 1
+            setTimeout(() => {
+              createParticle(e.clientX, e.clientY, angle, distance, colorIndex)
+            }, i * 12)
+          }
+          for (let i = 0; i < 4; i++) {
+            const randomAngle = Math.random() * Math.PI * 2
+            const randomDistance = baseDistance + Math.random() * 10
+            const colorIndex = Math.floor(Math.random() * 10) + 1
+            setTimeout(
+              () => {
+                createParticle(e.clientX, e.clientY, randomAngle, randomDistance, colorIndex)
+              },
+              (particleCount + i) * 12
+            )
+          }
+        })
+      })
+    </script>
+
+    <script>
+      import { initializeWebGL } from '@/utils/webgl/index'
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeWebGL)
+      } else {
+        initializeWebGL()
+      }
+    </script>
+  </body>
+</html>

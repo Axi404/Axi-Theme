@@ -1,0 +1,71 @@
+---
+import type { iconsType } from '@/types'
+import { Icon, SimpleIcon } from '@/components/user'
+
+interface Props {
+  class?: string
+  distributions: {
+    title: string
+    url: string
+    platform: string
+  }[]
+}
+
+const { class: className, distributions, ...props } = Astro.props
+
+const platformIconSet: Record<string, { type: 'icon' | 'simple', name: string, color?: string }> = {
+  vercel: { type: 'simple', name: 'vercel', color: '#000000' },
+  vultr: { type: 'simple', name: 'vultr', color: '#007BFC' },
+  github: { type: 'simple', name: 'github', color: '#181717' },
+  cloudflare: { type: 'simple', name: 'cloudflare', color: '#F38020' },
+  default: { type: 'icon', name: 'earth' }
+}
+
+
+---
+
+<div class={className} {...props}>
+  <div class='grid grid-cols-1 gap-3 md:grid-cols-2'>
+    {
+      distributions.map((dist) => {
+        const iconConfig = platformIconSet[dist.platform.toLowerCase()] || platformIconSet.default
+        
+        return (
+          <div class='group relative overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-foreground/25 hover:shadow-lg'>
+            <a
+              href={`https://${dist.url}`}
+              class='block -py-2 pl-4 pr-4 w-full no-underline'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <div class='flex items-center gap-4'>
+                <div class='flex h-12 w-12 items-center justify-center rounded-lg bg-muted'>
+                  {iconConfig.type === 'simple' ? (
+                    <SimpleIcon 
+                      class='size-6' 
+                      name={iconConfig.name} 
+                      color={iconConfig.color}
+                    />
+                  ) : (
+                    <Icon class='size-6' name={iconConfig.name as iconsType} />
+                  )}
+                </div>
+                <div class='flex-1 min-w-0'>
+                  <h3 class='text-base font-semibold text-foreground group-hover:text-primary transition-colors no-underline leading-tight'>
+                    {dist.title}
+                  </h3>
+                  <p class='text-sm text-muted-foreground font-mono no-underline -mt-1'>
+                    {dist.url}
+                  </p>
+                </div>
+                <div class='ml-3 transition-transform group-hover:translate-x-1'>
+                  <Icon class='size-5 text-muted-foreground group-hover:text-foreground transition-colors rotate-90' name='up' />
+                </div>
+              </div>
+            </a>
+          </div>
+        )
+      })
+    }
+  </div>
+</div>

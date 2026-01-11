@@ -1,0 +1,48 @@
+---
+title: "Friend Circle: Setup & Configuration"
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: Use Friend-Circle-Lite as the data source and render the feed on the Links page.
+category: tech
+tags:
+  - links
+  - friend-circle
+  - rss
+language: en
+---
+
+## 1. What is Friend Circle
+
+Friend Circle shows an aggregated feed from your blogroll. In this theme it appears on the Links page:
+
+- `src/pages/links/index.astro`
+
+## 2. Prepare the Data Source (Friend-Circle-Lite)
+
+This theme consumes Friend-Circle-Lite data (like `all.json`). Reference setup guide:
+
+- [Friend Circle: Setup & Configuration](https://blog.liushen.fun/posts/4dc716ec/)
+
+You should end up with a domain like:
+
+```txt
+fc.example.com
+```
+
+and ensure this is accessible:
+
+```txt
+https://fc.example.com/all.json
+```
+
+## 3. Enable in the Theme
+
+Edit `src/site.config.ts`:
+
+- `theme.personal.domains.friendCircle = 'fc.example.com'`
+
+After that, `/links` will automatically render the “Small Circle” section.
+
+## 4. RSS Reminder
+
+If a site is in your links but never shows up in the feed, it usually means its RSS is missing or unreachable.

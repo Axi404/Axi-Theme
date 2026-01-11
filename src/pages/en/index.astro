@@ -1,0 +1,77 @@
+---
+import { Image } from 'astro:assets'
+import { Button, Card, Icon, Label, Spoiler } from '@/components/user'
+import BlogStats from '@/components/home/BlogStats.astro'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import Section from '@/components/home/Section.astro'
+import avatar from '@/assets/avatar.png'
+import config from '@/site-config'
+import GitHubActivityCalendar from '@/components/home/GitHubActivityCalendar.astro'
+---
+
+<PageLayout meta={{ title: 'Home' }} highlightColor='#659EB966'>
+  <main class='flex w-full flex-col items-center'>
+    <section class='animate mb-10 flex flex-col items-center gap-y-7' id='content-header'>
+      <div class='flex flex-row items-center gap-x-6'>
+        <Image
+          src={avatar}
+          alt='profile'
+          class='h-36 w-auto rounded-lg border p-1'
+          loading='eager'
+        />
+        <div class='flex flex-col gap-y-4'>
+          <h1 class='text-3xl font-bold'>{config.author_en}</h1>
+          <div class='flex flex-wrap gap-x-1 gap-y-1'>
+            {config.personal?.location && (
+              <Label title={config.personal.location}>
+                <Icon name='location' class='size-4' slot='icon' />
+              </Label>
+            )}
+            {config.personal?.githubUsername && (
+              <Label
+                title='Github'
+                as='a'
+                href={`https://github.com/${config.personal.githubUsername}`}
+                target='_blank'
+              >
+                <Icon name='github' class='size-4' slot='icon' />
+              </Label>
+            )}
+            {config.personal?.email && (
+              <Label title='Email' as='a' href={`mailto:${config.personal.email}`}>
+                <Icon name='email' class='size-4' slot='icon' />
+              </Label>
+            )}
+            {config.personal?.googleScholar && (
+              <Label title='Scholar' as='a' href={config.personal.googleScholar}>
+                <Icon name='earth' class='size-4' slot='icon' />
+              </Label>
+            )}
+          </div>
+        </div>
+      </div>
+
+    <div id='content' class='animate flex flex-col gap-y-10 md:w-4/5 lg:w-5/6'>
+      <Section title='About'>
+        <p class='text-muted-foreground'>Write your personal introduction here. It is recommended to have more than one line for better visual effect. This is a blog theme based on Axi-Theme. You can showcase your projects, experiences, and thoughts here.</p>
+        <Button title='More about me' class='w-fit self-end' href='/en/about' style='ahead' />
+      </Section>
+      <Section title='Education'>
+        <Card
+          as='a'
+          heading='Your School / Organization'
+          subheading='Your Degree / Position'
+          date='Start Date - End Date'
+          href='#'
+        >
+        </Card>
+      </Section>
+      <Section title='Statistics'>
+        <BlogStats blogStartDate={config.personal?.blogStartDate ? new Date(config.personal.blogStartDate) : new Date('2024-06-15')} />
+      </Section>
+      {config.personal?.githubUsername && (
+        <GitHubActivityCalendar username={config.personal.githubUsername}/>
+      )}
+    </div>
+  </main>
+</PageLayout>

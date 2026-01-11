@@ -1,0 +1,25 @@
+---
+import { cn } from '@/utils'
+
+const { class: className, as: Tag = 'div', title, href, ...props } = Astro.props
+---
+
+<Tag
+  class={cn(
+    'group relative flex flex-row items-center justify-center gap-x-2 rounded-lg bg-gradient-to-r from-muted/80 via-muted/60 to-muted/80 border border-border/50 px-3 py-2 text-sm font-medium text-muted-foreground backdrop-blur-sm transition-all duration-300',
+    href && 'cursor-pointer hover:border-primary/40 hover:bg-gradient-to-r hover:from-primary/10 hover:via-primary/5 hover:to-primary/10 hover:text-primary hover:shadow-md hover:shadow-primary/20 hover:-translate-y-0.5',
+    !href && 'cursor-default',
+    className
+  )}
+  href={href}
+  {...props}
+>
+  <!-- 背景光效 -->
+  <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+  
+  <!-- 内容区域 -->
+  <div class="relative flex items-center gap-x-2">
+    <slot name='icon' />
+    <p class="my-0 transition-colors duration-300">{title}</p>
+  </div>
+</Tag>

@@ -1,0 +1,64 @@
+---
+title: "MDX Components: User & Advanced"
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: How to use built-in content components (Aside/Tabs, etc.) and advanced widgets (LinkPreview/GithubCard, etc.).
+category: tech
+tags:
+  - mdx
+  - components
+language: en
+---
+
+import { Aside, Tabs, TabItem, Spoiler } from '@/components/user'
+import { GithubCard, LinkPreview, QRCode, ImageGroup, WebVideo } from '@/components/advanced'
+
+## 1. Use MDX (Required)
+
+`.md` cannot `import` components. Use `.mdx` (e.g. `src/content/blogs/<slug>/index.mdx`).
+
+## 2. User Component Examples
+
+<Aside type='tip' title='Tip'>
+You can render theme components directly inside MDX.
+</Aside>
+
+<Tabs>
+  <TabItem label='A'>
+    Panel A content
+  </TabItem>
+  <TabItem label='B'>
+    Panel B content
+  </TabItem>
+</Tabs>
+
+<Spoiler label='Click to reveal'>
+Hidden content goes here.
+</Spoiler>
+
+## 3. Advanced Component Examples
+
+### GitHub Card
+
+<GithubCard repo='Axi404/Axi-Theme' />
+
+### Link Preview
+
+<LinkPreview href='https://astro.build/' />
+
+### QR Code
+
+<QRCode content='https://axi404.top/' class='mt-2' />
+
+### Image Group (masonry-like row)
+
+<ImageGroup
+  images={[
+    { src: 'https://picr2.axi404.top/1767811093734_image.webp', alt: 'Image A', aspectRatio: 16 / 9 },
+    { src: 'https://picr2.axi404.top/1767811093734_image.webp', alt: 'Image B', aspectRatio: 1 },
+  ]}
+/>
+
+### Embedded Video
+
+<WebVideo src='https://www.youtube.com/embed/dQw4w9WgXc' title='Video' />

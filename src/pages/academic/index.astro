@@ -1,0 +1,134 @@
+---
+import PageLayout from '@/layouts/CommonPage.astro'
+import {
+  Button,
+  Icon,
+  PublicationSection,
+  ResearchProjectSection,
+  SimpleIcon
+} from '@/components/user'
+import config from '@/site-config'
+
+const headings = [
+  { depth: 2, slug: 'about-me', text: 'About Me' },
+  { depth: 2, slug: 'research-interests', text: 'Research Interests' },
+  { depth: 2, slug: 'publications', text: 'Publications' },
+  { depth: 2, slug: 'open-source-projects', text: 'Open-source Projects' }
+]
+---
+
+<PageLayout title='Academic' {headings} info={{ slug: '/academic', hideComment: true }}>
+  <h2 id='about-me'>About Me<a class='anchor' href='#about-me'>#</a></h2>
+  <p>
+    在此处介绍你的学术背景。例如：我是某某大学的几级本科生/研究生，目前在某个实验室实习或学习，师从某某教授，研究方向是某某。
+  </p>
+
+  <p>我的研究理念：在这里写下你对研究的看法和态度。</p>
+  <p>
+    你可以详细描述你的研究动机、目标以及你目前正在关注的具体问题。
+  </p>
+
+  <p>这是我的学术简历，欢迎下载。</p>
+  <Button title='下载简历' class='w-fit' href='#' target='_blank'>
+    <Icon class='size-5' name='download' slot='before' />
+  </Button>
+  <h2 id='research-interests'>
+    Research Interests<a class='anchor' href='#research-interests'>#</a>
+  </h2>
+  <div class='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+    {
+      [
+        {
+          title: '研究方向 1',
+          description: '关于该研究方向的详细描述，包括关键词等。',
+          icon: 'ros'
+        },
+        {
+          title: '研究方向 2',
+          description: '关于该研究方向的详细描述，包括关键词等。',
+          icon: 'pytorch'
+        }
+      ].map((interest) => (
+        <div class='group relative overflow-hidden rounded-xl border border-border bg-card p-4 transition-all hover:border-foreground/25 hover:shadow-md'>
+          <div class='flex items-start gap-4'>
+            <div class='flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/20'>
+              <SimpleIcon
+                class='size-5 text-primary transition-transform duration-300 group-hover:scale-110'
+                name={interest.icon}
+              />
+            </div>
+            <div class='flex-1'>
+              <p class='text-xl font-medium leading-tight text-foreground transition-colors group-hover:text-primary'>
+                {interest.title}
+              </p>
+              <p class='text-sm leading-relaxed text-muted-foreground'>{interest.description}</p>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+  <h2 id='publications'>Publications<a class='anchor' href='#publications'>#</a></h2>
+  <PublicationSection
+    publications={[
+      {
+        title:
+          '论文标题：此处填入你的论文题目',
+        authors: [
+          { name: '作者 1', isEqual: true },
+          { name: '作者 2', isMe: true },
+          { name: '作者 3', isCoreContributor: true }
+        ],
+        venue: '发表会议或期刊名称 (如 CVPR, ECCV)',
+        year: '202X',
+        type: 'conference',
+        abstract:
+          '此处填入论文摘要。简要介绍论文的研究背景、方法和主要贡献。',
+        links: [
+          { type: 'website', href: '#' },
+          { type: 'arxiv', href: '#' }
+        ],
+        status: 'published'
+      }
+    ]}
+  />
+  <h2 id='open-source-projects'>
+    Open-source Projects<a class='anchor' href='#open-source-projects'>#</a>
+  </h2>
+  <ResearchProjectSection
+    projects={[
+      {
+        title: '项目名称',
+        description:
+          '项目描述：简要介绍该开源项目的功能和用途。',
+        category: '项目类别',
+        status: 'active',
+        links: [
+          { type: 'github', href: '#', label: 'Code' }
+        ]
+      }
+    ]}
+  />
+</PageLayout>
+
+<script
+  is:inline
+  type='module'
+  data-astro-rerun
+  define:vars={{ npmCDN: config.npmCDN, walineServer: config.integ.waline.server }}
+>
+  const normalizePath = (path) => {
+    if (path === '/') return path
+    return path.endsWith('/') ? path.slice(0, -1) : path
+  }
+
+  const loadPageviewCount = async () => {
+    const pageview = await import(`${npmCDN}/@waline/client@v3/dist/pageview.js`)
+    pageview.pageviewCount({
+      serverURL: walineServer,
+      path: normalizePath(window.location.pathname)
+    })
+  }
+
+  await loadPageviewCount()
+</script>

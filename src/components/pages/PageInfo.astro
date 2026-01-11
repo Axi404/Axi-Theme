@@ -1,0 +1,23 @@
+---
+import { cn } from '@/utils'
+
+const { class: className, hideComment, ...props } = Astro.props
+
+const normalizePath = (path: string) => {
+  if (path === '/') return path
+  return path.endsWith('/') ? path.slice(0, -1) : path
+}
+
+const path = normalizePath(Astro.url.pathname)
+---
+
+<div class={cn('text-base text-sm text-muted-foreground', className)} {...props}>
+  <span class='waline-pageview-count' data-path={path}></span> views
+  {
+    !hideComment && (
+      <a href='#waline'>
+        | <span class='waline-comment-count' data-path={path} /> comments
+      </a>
+    )
+  }
+</div>

@@ -1,0 +1,69 @@
+---
+import { cn } from '@/utils'
+import PublicationCard from './PublicationCard.astro'
+
+interface Props {
+  class?: string
+  publications: Array<{
+    title: string
+    authors: Array<{
+      name: string
+      isMe?: boolean
+      isEqual?: boolean
+      isCoreContributor?: boolean
+      role?: 'corresponding' | 'project-leader'
+      homepage?: string
+    }>
+    authorsAlphabetical?: boolean
+    venue: string
+    year: string
+    type: 'conference' | 'journal' | 'workshop' | 'preprint'
+    abstract?: string
+    links: {
+      type: string
+      href: string
+    }[]
+    status: 'published' | 'accepted' | 'under-review' | 'preprint'
+    citations?: number
+  }>
+  groupByYear?: boolean
+}
+
+const { class: className, publications, groupByYear = true } = Astro.props
+
+// Group publications by year if requested
+const groupedPublications = groupByYear
+  ? publications.reduce(
+      (acc, pub) => {
+        const year = pub.year
+        if (!acc[year]) {
+          acc[year] = []
+        }
+        acc[year].push(pub)
+        return acc
+      },
+      {} as Record<string, typeof publications>
+    )
+  : { 'All Publications': publications }
+
+// Sort years in descending order
+const sortedYears = Object.keys(groupedPublications).sort((a, b) => {
+  if (a === 'All Publications') return 0
+  return parseInt(b) - parseInt(a)
+})
+---
+
+<div class={cn('space-y-8', className)}>
+  {
+    sortedYears.map((year) => (
+      <div>
+        {groupByYear && <p class='mb-4 text-xl font-semibold text-foreground'>{year}</p>}
+        <div class='space-y-4'>
+          {groupedPublications[year].map((publication) => (
+            <PublicationCard {publication} />
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</div>

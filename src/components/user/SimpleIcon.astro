@@ -1,0 +1,42 @@
+---
+interface Props {
+  name: string
+  class?: string
+  size?: string | number
+  color?: string
+}
+
+const { name, class: className = '', size = '24', color = 'currentColor' } = Astro.props
+
+// 动态导入图标
+let iconSvg: string = ''
+try {
+  const iconName = `si${name.charAt(0).toUpperCase() + name.slice(1)}`
+  const icons = await import('simple-icons')
+  const iconData = (icons as any)[iconName]
+
+  if (iconData) {
+    iconSvg = iconData.svg
+  }
+} catch (error) {
+  // 静默处理错误
+}
+---
+
+{
+  iconSvg ? (
+    <svg
+      class={className}
+      width={size}
+      height={size}
+      viewBox='0 0 24 24'
+      fill={color}
+      set:html={iconSvg}
+    />
+  ) : (
+    <div class={`${className} inline-block`} style={`width: ${size}px; height: ${size}px;`}>
+      <span class='text-xs'>?</span>
+    </div>
+  )
+}
+

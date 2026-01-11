@@ -1,0 +1,94 @@
+---
+import config from '@/site-config'
+
+import { Icon } from '@/components/user'
+
+const year = new Date().getFullYear()
+const footerConf = config.footer || {}
+
+// Create social links with RSS
+const socialLinks = {
+  ...(footerConf.social || {}),
+  rss: '/rss.xml'
+}
+---
+
+<script>
+  const icpLink = document.getElementById('icp-registration')
+  if (icpLink) {
+    const website = icpLink.dataset.website
+    if (website) {
+      try {
+        // Try to parse as URL first
+        const targetHostname = new URL(website.includes('://') ? website : `https://${website}`).hostname
+        if (window.location.hostname === targetHostname) {
+          icpLink.classList.remove('hidden')
+        }
+      } catch {
+        // Fallback to direct string comparison
+        if (window.location.hostname === website) {
+          icpLink.classList.remove('hidden')
+        }
+      }
+    }
+  }
+</script>
+
+<footer class='mx-auto mb-5 mt-16'>
+  <div class='border-t border-border pt-5'>
+    <div class='flex items-center gap-y-3 max-sm:flex-col sm:justify-between sm:gap-y-0'>
+      <div
+        class='flex items-center gap-x-4 gap-y-2 text-muted-foreground max-sm:flex-col [&_a:hover]:text-primary [&_a]:text-foreground'
+      >
+        {
+          footerConf.registration && footerConf.registration.website && (
+            <a
+              id='icp-registration'
+              class='hidden text-xs'
+              data-website={footerConf.registration.website}
+              style='color:hsl(var(--muted-foreground)/var(--tw-text-opacity,1))'
+              href={footerConf.registration.url}
+              target='_blank'
+            >
+              {footerConf.registration.text}
+            </a>
+          )
+        }
+        <span>
+          © {year}
+          {config.author} &
+          <a href='/terms/list'>Site policy</a>
+        </span>
+        {
+          footerConf.credits && (
+            <span class='text-muted-foreground [&_a:hover]:text-primary [&_a]:text-foreground'>
+              <a href='https://github.com/withastro/astro' target='_blank'>
+                Astro
+              </a>
+              {/* &
+              <a href='https://github.com/cworld1/astro-theme-pure' target='_blank'>
+                Pure
+              </a> */}
+              theme powered
+            </span>
+          )
+        }
+      </div>
+
+      {/* Social Brands */}
+      <div class='flex items-center gap-x-4'>
+        {
+          Object.entries(socialLinks).map(([platform, url]) => (
+            <a
+              class='inline-block text-muted-foreground transition-all hover:text-muted-foreground/75'
+              href={url as string}
+              aria-label={platform}
+            >
+              <Icon name={platform as any} />
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</footer>

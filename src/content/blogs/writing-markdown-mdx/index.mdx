@@ -1,0 +1,57 @@
+---
+title: 写作指南：Markdown / MDX
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: 主题内支持的 Markdown 扩展、数学公式、代码高亮与一些写作约定。
+category: tech
+tags:
+  - markdown
+  - mdx
+  - writing
+language: zh
+---
+
+## 1. Markdown 支持范围
+
+主题默认启用了常用扩展：
+
+- GFM：表格、删除线、任务列表等
+- 数学公式：KaTeX（`$...$` / `$$...$$`）
+- 代码高亮：Shiki（支持标题、差异标注等）
+
+## 2. 数学公式（KaTeX）
+
+行内：
+
+```md
+欧拉公式：$e^{i\\pi}+1=0$
+```
+
+块级：
+
+```md
+$$
+\\int_0^1 x^2 dx = \\frac{1}{3}
+$$
+```
+
+## 3. 代码块增强（差异/高亮）
+
+你可以在代码中使用注释标记来展示变更（示例来自主题的高亮 transformer）：
+
+```ts
+const a = 1 // [!code --]
+const a = 2 // [!code ++]
+```
+
+也可以做行高亮：
+
+```ts
+const token = 'secret' // [!code highlight]
+```
+
+## 4. 什么时候用 MDX
+
+当你需要在文章里使用组件（例如 `Aside`、`Tabs`、`GithubCard` 等）时，请使用 `.mdx`，并在文件顶部 `import` 组件。
+
+组件用法示例文档：见 “MDX 组件使用”。

@@ -1,0 +1,50 @@
+---
+title: Friend Circle（朋友圈）：接入与配置
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: 使用 Friend-Circle-Lite 生成数据源，并在 Links 页面展示朋友圈动态。
+category: tech
+tags:
+  - links
+  - friend-circle
+  - rss
+language: zh
+---
+
+## 1. Friend Circle 是什么
+
+“朋友圈”页面会展示友链站点的最新文章聚合，适合在 Links 页让访问者快速看到朋友们的新内容。
+
+本主题的 Links 页集成入口在：
+
+- `src/pages/links/index.astro`
+
+## 2. 先准备数据源（Friend-Circle-Lite）
+
+本主题使用 Friend-Circle-Lite 的接口数据（`all.json` 等）。搭建与使用方式建议参考：
+
+- [Friend Circle 参考文档](https://blog.liushen.fun/posts/4dc716ec/)
+
+你需要得到一个可访问的域名，例如：
+
+```txt
+fc.example.com
+```
+
+并确保以下地址可访问：
+
+```txt
+https://fc.example.com/all.json
+```
+
+## 3. 在主题中启用
+
+编辑 `src/site.config.ts`，设置：
+
+- `theme.personal.domains.friendCircle = 'fc.example.com'`
+
+配置完成后，`/links` 页面会自动显示 “Small Circle / 朋友圈” 区块。
+
+## 4. 友链 RSS 建议
+
+如果某个站点在友链里但朋友圈里没有内容，通常是该站点未提供 RSS 或 RSS 不可访问。建议为友链站点补全 RSS。

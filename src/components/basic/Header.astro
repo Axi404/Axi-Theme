@@ -1,0 +1,375 @@
+---
+import config from '@/site-config'
+import { Icon } from '@/components/user'
+import LanguageSwitch from '@/components/user/LanguageSwitch.astro'
+import { getRelativeLocaleUrl } from 'astro:i18n'
+import { getBlogCollection, getUniqueCategories } from '@/server'
+
+// Get all categories for the dropdown menu
+const allCollections = await getBlogCollection()
+const allCategories = getUniqueCategories(allCollections)
+
+// Define category display names and filter allowed categories
+const categoryMap: Record<string, string> = {
+  'tech': 'Technical',
+  'daily': 'Daily Life',
+  'research': 'Research',
+  'journal': 'Month Journal'
+}
+
+// Define custom order (Research first)
+const categoryOrder = ['research', 'tech', 'daily', 'journal']
+
+// Filter and map categories with custom order
+const categories = categoryOrder
+  .filter(cat => allCategories.includes(cat))
+  .map(cat => ({ slug: cat, name: categoryMap[cat] }))
+
+// 处理 trailingSlash: 'never' 配置的辅助函数
+function getLocalizedUrl(locale: string | undefined, path: string) {
+  let url = getRelativeLocaleUrl(locale || 'zh', path)
+  // 移除尾部斜杠（除了根路径 /）
+  if (url !== '/' && url.endsWith('/')) {
+    url = url.slice(0, -1)
+  }
+  return url
+}
+---
+
+<header-component
+  class='group sticky top-4 z-30 mb-12 flex items-center justify-between rounded-xl border border-transparent max-sm:py-1 sm:rounded-2xl [&.not-top]:border-border [&.not-top]:bg-background/60 [&.not-top]:px-1.5 [&.not-top]:backdrop-blur-md dark:[&.not-top]:bg-muted/60'
+>
+  <!-- <div
+      class='absolute -left-4 -top-8 -z-10 box-content hidden h-20 w-[calc(100%+2rem)] !duration-0 max-sm:group-[.expanded]:block max-sm:group-[.expanded.not-top]:hidden max-sm:group-[.expanded]:bg-white dark:max-sm:group-[.expanded]:bg-muted'
+    >
+    </div> -->
+  <a
+    class='z-30 text-xl font-semibold group-[.not-top]:ms-2 sm:group-[.not-top]:ms-3'
+    style='transition:margin-inline 0.3s'
+    href={getLocalizedUrl(Astro.currentLocale, '/')}
+    aria-label='Brand'>{config.title}</a
+  >
+
+  <div class='flex items-center gap-x-2'>
+    {/* Menu links */}
+    <div
+      id='headerExpandConetent'
+      class='end-0 start-0 top-12 grid border border-transparent group-[.not-top]:rounded-xl group-[.expanded]:opacity-100 dark:group-[.expanded.not-top]:bg-muted/60 max-md:absolute max-md:opacity-0 max-md:pointer-events-none max-md:group-[.expanded]:pointer-events-auto max-md:group-[.not-top]:border-border max-md:group-[.expanded.not-top]:bg-background/60 max-md:group-[.expanded.not-top]:backdrop-blur-md max-md:group-[.not-top]:px-4 max-md:group-[.not-top]:py-2 md:grid-rows-1'
+    >
+      <div class='flex flex-col items-center justify-center md:flex-row'>
+        {
+          (config.header?.menu || []).map((item: any) => {
+            const isBlogMenu = item.link === '/blog/research' || item.title === 'Blog'
+            if (isBlogMenu && categories.length > 0) {
+              return (
+                <div class='menu-item-with-dropdown relative w-full md:w-fit' style='position: relative;'>
+                  <a
+                    href={getLocalizedUrl(Astro.currentLocale, item.link)}
+                    class='blog-menu-link flex w-full flex-none items-center justify-end py-2 font-medium transition-none hover:text-primary md:px-3 md:justify-center'
+                    aria-label='Nav menu item'
+                  >
+                    {item.title}
+                    <Icon name='chevron-down' class='chevron-icon ml-1 size-4 transition-transform' />
+                  </a>
+                  {/* Dropdown menu */}
+                  <div class='dropdown-menu absolute right-0 top-full mt-0 w-48 rounded-xl border border-border bg-background/80 shadow-lg backdrop-blur-md dark:bg-muted/80 md:left-0 md:right-auto' style='z-index: 9999;'>
+                    <div class='py-1'>
+                      {categories.map((category) => (
+                        <a
+                          href={getLocalizedUrl(Astro.currentLocale, `/blog/${category.slug}`)}
+                          class='category-link block px-4 py-2 text-sm transition-colors hover:bg-background/60 hover:text-primary dark:hover:bg-muted/60'
+                        >
+                          {category.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+            
+            return (
+              <a
+                href={getLocalizedUrl(Astro.currentLocale, item.link)}
+                class='w-full flex-none grow py-2 text-right font-medium transition-none hover:text-primary md:w-fit md:px-3'
+                aria-label='Nav menu item'
+              >
+                {item.title}
+              </a>
+            )
+          })
+        }
+        <a class='w-full flex-none grow py-2 text-right font-medium transition-none hover:text-primary md:w-fit md:px-3' href='https://www.travellings.cn/go.html' title='Travellings' target='_blank' rel='noopener noreferrer'>
+          <span class='sr-only'>Travellings</span>
+          <span class='text-xl'>🚇</span>
+        </a>
+        <div class='flex w-full grow flex-row justify-end gap-x-3 md:w-fit md:gap-x-5'>
+          <a class='px-1 py-2 transition-none md:px-2' href={getLocalizedUrl(Astro.currentLocale, '/search')} title='Search'>
+            <span class='sr-only'>Search</span>
+            <Icon name='search' class='size-5' />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- buttons -->
+    <div class='z-30 flex gap-x-4 group-[.not-top]:gap-x-2' style='transition:gap 0.3s'>
+      <LanguageSwitch />
+      <button
+        id='toggleDarkMode'
+        class='group/dark box-content size-5 rounded-md border p-1.5 transition-colors hover:bg-border md:group-[.not-top]:rounded-xl'
+      >
+        <span class='sr-only'>Dark Theme</span>
+        <Icon class='system size-5 group-hover/dark:text-primary' name='computer' />
+        <Icon class='light hidden size-5 group-hover/dark:text-primary' name='sun' />
+        <Icon class='dark hidden size-5 group-hover/dark:text-primary' name='moon' />
+      </button>
+      <button
+        id='toggleMenu'
+        class='rounded-md border p-1.5 transition-colors hover:bg-border md:hidden md:group-[.not-top]:rounded-xl'
+      >
+        <span class='sr-only'>Menu</span>
+        <Icon class='size-5' name='menu' />
+      </button>
+    </div>
+  </div>
+</header-component>
+
+{/* Use inline to load icon quicker firstly */}
+<script is:inline>
+  const toggleDarkModeElement = document.getElementById('toggleDarkMode')
+  if (toggleDarkModeElement) {
+    toggleDarkModeElement.dataset.theme = localStorage.getItem('theme') || 'system'
+  }
+</script>
+<script>
+  import { setTheme, showToast } from '@/utils'
+
+  class Header extends HTMLElement {
+    constructor() {
+      super()
+    }
+
+    connectedCallback() {
+      // Header
+      let preScrollY = window.scrollY
+      this.classList.toggle('not-top', preScrollY > 20)
+      window.addEventListener('scroll', () => {
+        this.classList.toggle('not-top', window.scrollY > 20)
+        this.dataset.show = (window.scrollY < 600 || window.scrollY < preScrollY).toString()
+        preScrollY = window.scrollY
+      })
+
+      // Dark Mode
+      const darkModeBtn = this.querySelector('#toggleDarkMode') as HTMLElement
+      darkModeBtn.addEventListener('click', () => {
+        // Old way: dispatch event
+        // const toggleDarkModeEvent = new CustomEvent('theme-change', {
+        //   detail: { theme: localStorage.getItem('theme') === 'light' ? 'dark' : 'light' }
+        // })
+        // document.dispatchEvent(toggleDarkModeEvent)
+        const newTheme = setTheme(undefined, true)
+        darkModeBtn.dataset.theme = newTheme
+        showToast({ message: `Set theme to ${newTheme}` })
+      })
+
+      // Menu
+      this.querySelector('#toggleMenu')?.addEventListener('click', () => {
+        this.classList.toggle('expanded')
+      })
+    }
+  }
+
+  customElements.define('header-component', Header)
+</script>
+
+<style>
+  header-component {
+    transition:
+      padding 0.3s,
+      transform 0.3s,
+      margin-inline 0.3s,
+      border 0.15s,
+      background-color 0.15s,
+      backdrop-filter 0.15s;
+
+    &.not-top {
+      box-shadow:
+        rgb(255, 255, 255) 0px 0px 0px 0px,
+        rgba(24, 24, 27, 0.08) 0px 0px 0px 1px,
+        rgba(39, 39, 42, 0.08) 0px 10px 15px -3px,
+        rgba(39, 39, 42, 0.08) 0px 4px 6px -4px;
+    }
+    &[data-show='false']:not(.expanded) {
+      transform: translateY(-5rem);
+    }
+  }
+
+  @media (min-width: 800px) {
+    header-component.not-top {
+      margin-inline: 8%;
+    }
+  }
+ 
+
+  /* header menu */
+  @media (max-width: 768px) {
+    #headerExpandConetent {
+      grid-template-rows: 0fr;
+      transition:
+        opacity 0.3s,
+        padding 0.3s,
+        border-color 0.15s,
+        grid-template-rows 0.3s,
+        backdrop-filter 0.15s,
+        background-color 0.15s;
+    }
+    .expanded #headerExpandConetent {
+      grid-template-rows: 1fr;
+    }
+    .expanded.not-top #headerExpandConetent {
+      box-shadow:
+        rgb(255, 255, 255) 0px 0px 0px 0px,
+        rgba(24, 24, 27, 0.08) 0px 0px 0px 1px,
+        rgba(39, 39, 42, 0.08) 0px 10px 15px -3px,
+        rgba(39, 39, 42, 0.08) 0px 4px 6px -4px;
+    }
+
+    /* header component after */
+    header-component #headerExpandConetent::after {
+      box-sizing: content-box;
+      content: '';
+      position: absolute;
+      inset-inline: calc(-1rem - 1px);
+      bottom: 0;
+      top: -5rem;
+      z-index: -1;
+      transition: all 0.3s;
+      visibility: hidden;
+      opacity: 0;
+      border-bottom: 1px solid transparent;
+    }
+    header-component:not(.not-top) #headerExpandConetent::after {
+      visibility: visible;
+      bottom: -1rem;
+      opacity: 1;
+      background-color: hsl(var(--muted) / 0.6);
+      backdrop-filter: blur(12px);
+      border-bottom-color: hsl(var(--border) / var(--tw-border-opacity, 1));
+    }
+  }
+
+  /* dark light mode toggle */
+  #toggleDarkMode {
+    &[data-theme='dark'] {
+      & .system {
+        display: none;
+      }
+      & .dark {
+        display: block;
+      }
+    }
+    &[data-theme='light'] {
+      & .system {
+        display: none;
+      }
+      .light {
+        display: block;
+      }
+    }
+  }
+
+  /* Dropdown menu styles */
+  .menu-item-with-dropdown {
+    position: relative !important;
+  }
+  
+  /* Add padding to the bottom of the menu item to create a hover bridge */
+  .menu-item-with-dropdown::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0.5rem;
+    background: transparent;
+  }
+  
+  .dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, visibility 0.2s;
+    pointer-events: none;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .menu-item-with-dropdown:hover .dropdown-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+  }
+  
+  .menu-item-with-dropdown:hover .chevron-icon {
+    transform: rotate(180deg);
+  }
+
+  /* Mobile dropdown adjustments */
+  @media (max-width: 768px) {
+    .menu-item-with-dropdown {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .menu-item-with-dropdown > a {
+      width: 100%;
+    }
+    
+    .dropdown-menu {
+      position: static !important;
+      margin-top: 0 !important;
+      width: 100% !important;
+      left: auto !important;
+      right: auto !important;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      padding-left: 0;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: translateY(0) !important;
+      pointer-events: none;
+    }
+
+    .expanded .dropdown-menu {
+      pointer-events: auto;
+    }
+
+    .dropdown-menu .py-1 {
+      padding-top: 0;
+      padding-bottom: 0.5rem;
+    }
+
+    .dropdown-menu .category-link {
+      padding: 0.5rem 0 0.5rem 2rem !important;
+      font-size: 0.875rem;
+      text-align: right !important;
+      opacity: 0.85;
+      display: block !important;
+      width: 100% !important;
+    }
+
+    .dropdown-menu .category-link:hover {
+      opacity: 1;
+      background: transparent !important;
+    }
+
+    .menu-item-with-dropdown .chevron-icon {
+      display: none;
+    }
+  }
+</style>

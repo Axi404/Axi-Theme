@@ -1,0 +1,65 @@
+---
+title: Deploy with GitHub + Vercel (Recommended)
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: Use GitHub for source control and Vercel for automated build & deploy (env vars + common pitfalls).
+category: tech
+tags:
+  - deployment
+  - vercel
+  - github
+language: en
+---
+
+## 1. Why GitHub + Vercel
+
+- Preview deployments for every PR
+- Push-to-deploy
+- HTTPS + CDN out of the box
+
+Reference walkthrough: [Website on Vercel](https://axi404.top/blog/website-vercel)
+
+## 2. Preflight Checklist
+
+Make sure it builds locally:
+
+```bash
+pnpm install
+pnpm build
+```
+
+Set your domain (at least the main domain):
+
+- `src/site.config.ts` → `theme.personal.domains.main`
+
+## 3. Vercel Notes
+
+This theme reads `DEPLOYMENT_PLATFORM` to pick adapter/output:
+
+- `vercel` (default): Vercel adapter, usually `server` output
+- `github`: GitHub Pages, `static` output
+- `cloudflare`: Cloudflare Pages, `static` output
+
+On Vercel, set:
+
+```txt
+DEPLOYMENT_PLATFORM=vercel
+```
+
+Build command:
+
+```txt
+pnpm build
+```
+
+Keep the output directory setting as default (Astro is handled by the adapter).
+
+## 4. Static Output (Optional)
+
+If you need a fully static site (e.g. GitHub Pages), set:
+
+```txt
+DEPLOYMENT_PLATFORM=github
+```
+
+and deploy the `dist/` output.

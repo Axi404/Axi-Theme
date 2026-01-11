@@ -1,0 +1,72 @@
+---
+title: Axi Theme 基础使用与配置
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: 从本地启动到站点配置：了解内容结构、配置入口与常见改动点。
+category: tech
+tags:
+  - axi-theme
+  - astro
+  - config
+language: zh
+---
+
+## 1. 前置条件
+
+- Node.js 18+（建议 20+）
+- 包管理器：`pnpm`
+
+```bash
+pnpm install
+pnpm dev
+```
+
+## 2. 目录结构（最常用）
+
+- `src/site.config.ts`：主题配置入口（站点信息、导航、集成配置等）
+- `src/content/blogs/<slug>/index.mdx`：中文文章
+- `src/content/blogs/<slug>/index-en.mdx`：英文文章（可选，没有则英文列表会回退到中文）
+- `public/`：静态资源（`/images/*`、`/avatar/*` 等）
+
+## 3. 配置站点信息（`src/site.config.ts`）
+
+常改字段：
+
+- `theme.title` / `theme.description`：站点标题/描述
+- `theme.personal.domains.main`：主域名（用于生成绝对链接、RSS 等）
+- `theme.header.menu`：导航菜单
+- `integ.pagefind`：站内搜索（Pagefind）
+- `integ.waline`：评论系统（见 Waline 文档）
+
+## 4. 写一篇文章（中英双语）
+
+1) 新建文件夹：`src/content/blogs/my-first-post/`
+2) 写中文：`src/content/blogs/my-first-post/index.mdx`
+3) 写英文：`src/content/blogs/my-first-post/index-en.mdx`（可选）
+
+最小 Frontmatter（两种语言都要有）：
+
+```md
+---
+title: My Title
+publishDate: 2026-01-11
+description: Short summary.
+tags: ['docs']
+---
+```
+
+## 5. 构建与产物
+
+```bash
+pnpm build
+pnpm preview
+```
+
+- 构建产物默认在 `dist/`
+- `astro.config.mjs` 会根据 `DEPLOYMENT_PLATFORM` 选择适配器与输出模式（详见部署文档）
+
+## 6. 部署推荐（GitHub + Vercel）
+
+建议使用 GitHub 托管代码 + Vercel 自动部署（PR 预览、回滚、CDN、HTTPS 都更省心）。
+
+- 部署思路与注意事项：[Website on Vercel](https://axi404.top/blog/website-vercel)

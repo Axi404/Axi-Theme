@@ -1,0 +1,138 @@
+---
+import type { ImageMetadata } from 'astro'
+import { Image } from 'astro:assets'
+
+import type { iconsType } from '@/types'
+import { Icon, SimpleIcon } from '@/components/user'
+import { cn } from '@/utils'
+
+interface Props {
+  class?: string
+  projects: {
+    image?: string
+    title: string
+    description: string
+    category?: string
+    status?: 'active' | 'completed' | 'archived'
+    links: {
+      type: string
+      href: string
+      label?: string
+    }[]
+  }[]
+}
+
+const { class: className, projects, ...props } = Astro.props
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/projects/*.{jpeg,jpg,png,gif,webp}'
+)
+
+const linkIconSet: Record<string, { type: 'icon' | 'simple', name: string, color?: string }> = {
+  github: { type: 'simple', name: 'github', color: '#181717' },
+  site: { type: 'icon', name: 'earth' },
+  website: { type: 'icon', name: 'earth' },
+  demo: { type: 'icon', name: 'play' },
+  doc: { type: 'icon', name: 'document' },
+  paper: { type: 'icon', name: 'document' },
+  arxiv: { type: 'simple', name: 'arxiv', color: '#B31B1B' },
+  video: { type: 'simple', name: 'youtube', color: '#FF0000' },
+  code: { type: 'icon', name: 'github-circle' },
+  release: { type: 'icon', name: 'package' },
+  huggingface: { type: 'simple', name: 'huggingface', color: '#FFD21E' },
+}
+
+const statusColors = {
+  active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  completed: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  archived: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+}
+---
+
+<div class={className} {...props}>
+  <div class='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+    {
+      projects.map((project) => {
+        let imagePath = null
+        if (project.image) {
+          imagePath = '/src/assets/projects/' + project.image
+          if (!images[imagePath]) {
+            console.warn(`Image not found: ${imagePath}`)
+          }
+        }
+
+        return (
+          <div class='group relative overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-foreground/25 hover:shadow-lg'>
+            {imagePath && images[imagePath] && (
+              <div class='relative h-48 overflow-hidden'>
+                <Image
+                  class='h-full w-full object-cover transition-transform group-hover:scale-105'
+                  src={images[imagePath]()}
+                  alt={project.title}
+                  loading='lazy'
+                />
+                <div class='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent' />
+                {project.status && (
+                  <div class='absolute right-3 top-3'>
+                    <span class={cn('px-2 py-1 text-xs font-medium rounded-full', statusColors[project.status])}>
+                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <div class='p-6'>
+              <div class='mb-3 flex items-start justify-between'>
+                <div class='flex-1'>
+                  <p class='text-xl text-foreground group-hover:text-primary transition-colors'>
+                    {project.title}
+                  </p>
+                  {project.category && (
+                    <span class='mt-1 inline-block text-sm text-muted-foreground'>
+                      {project.category}
+                    </span>
+                  )}
+                </div>
+                {!imagePath && project.status && (
+                  <span class={cn('px-2 py-1 text-xs font-medium rounded-full', statusColors[project.status])}>
+                    {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                  </span>
+                )}
+              </div>
+              
+              <p class='mb-4 text-muted-foreground leading-relaxed'>
+                {project.description}
+              </p>
+              
+              <div class='flex flex-wrap gap-2'>
+                {project.links.map((link) => {
+                  const iconConfig = linkIconSet[link.type] || { type: 'icon', name: 'earth' }
+                  return (
+                    <a
+                      href={link.href}
+                      class='inline-flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground'
+                      aria-label={link.label || link.type}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                    >
+                      {iconConfig.type === 'simple' ? (
+                        <SimpleIcon 
+                          class='size-4' 
+                          name={iconConfig.name} 
+                          color={iconConfig.color}
+                        />
+                      ) : (
+                        <Icon class='size-4' name={iconConfig.name as iconsType} />
+                      )}
+                      {link.label || link.type.charAt(0).toUpperCase() + link.type.slice(1)}
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )
+      })
+    }
+  </div>
+</div>

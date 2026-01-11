@@ -1,0 +1,115 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n'
+
+import clsx from '@/utils/clsx'
+
+interface TOCItem {
+  id: string
+  title: string
+  order: number
+  href: string
+}
+
+interface TOCCategory {
+  id: string
+  title: string
+  items: TOCItem[]
+}
+
+interface Props {
+  title?: string
+  categories: TOCCategory[]
+  class?: string
+  id?: string
+}
+
+const { title = 'DOCS', categories, class: className, ...props } = Astro.props
+function getLocalizedUrl(locale: string | undefined, path: string) {
+  let url = getRelativeLocaleUrl(locale || 'zh', path)
+  // 移除尾部斜杠（除了根路径 /）
+  if (url !== '/' && url.endsWith('/')) {
+    url = url.slice(0, -1)
+  }
+  return url
+}
+---
+
+<docs-toc class={clsx('not-prose', className)} {...props}>
+  {title && <h2 class='font-semibold text-foreground'>{title}</h2>}
+  <ul class='mt-4 flex flex-col gap-y-5'>
+    {
+      categories.map((category) => (
+        <li>
+          <h3 class='text-xs uppercase tracking-widest text-muted-foreground'>{category.title}</h3>
+          <ul class='mt-2 flex flex-col'>
+            {category.items
+              .sort((a, b) => a.order - b.order)
+              .map((item) => (
+                <li class='docs-item relative ms-2 flex rounded-2xl px-3 py-1 text-foreground/75 transition-all hover:bg-muted/50'>
+                  <a
+                    class='flex-1 hover:text-foreground'
+                    href={getLocalizedUrl(Astro.currentLocale, item.href)}
+                  >
+                    {item.title}
+                  </a>
+                </li>
+              ))}
+          </ul>
+        </li>
+      ))
+    }
+  </ul>
+</docs-toc>
+
+<style>
+  .docs-item:hover {
+    background-color: hsl(var(--muted) / 0.5);
+  }
+
+  .docs-item::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 5%;
+    bottom: 5%;
+    left: -0.5rem;
+    width: 2px;
+    background-color: hsl(var(--input) / var(--un-bg-opacity));
+  }
+
+  .docs-item.docs-hl {
+    background-color: hsl(var(--muted) / var(--un-bg-opacity));
+    font-weight: 500;
+  }
+
+  .docs-item.docs-hl a {
+    color: hsl(var(--primary) / var(--un-text-opacity));
+  }
+
+  .docs-item.docs-hl::before {
+    background-color: hsl(var(--primary) / var(--un-bg-opacity));
+  }
+</style>
+
+<script>
+  class DocsTOC extends HTMLElement {
+    link: string = ''
+
+    constructor() {
+      super()
+
+      this.link = window.location.pathname
+    }
+
+    connectedCallback() {
+      const links = this.querySelectorAll('a')
+      links.forEach((link) => {
+        if (link.getAttribute('href') === this.link) {
+          link.parentElement?.classList.add('docs-hl')
+        }
+      })
+    }
+  }
+
+  customElements.define('docs-toc', DocsTOC)
+</script>

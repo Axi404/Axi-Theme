@@ -1,0 +1,107 @@
+---
+import { Image } from 'astro:assets'
+import type { CollectionEntry } from 'astro:content'
+import { getRelativeLocaleUrl } from 'astro:i18n'
+import { Icon } from '@/components/user'
+import { cn } from '@/utils'
+
+interface Props {
+  collection: CollectionEntry<'postCollections'>
+  minimal?: boolean
+  class?: string
+}
+
+const { collection, minimal = false, class: className } = Astro.props
+const { id, data } = collection
+
+const isEn = Astro.currentLocale === 'en'
+const title = isEn && data.title_en ? data.title_en : data.title
+const description = isEn && data.description_en ? data.description_en : data.description
+
+function getLocalizedUrl(locale: string | undefined, path: string) {
+  let url = getRelativeLocaleUrl(locale || 'zh', path)
+  if (url !== '/' && url.endsWith('/')) {
+    url = url.slice(0, -1)
+  }
+  return url
+}
+
+const collectionUrl = getLocalizedUrl(Astro.currentLocale, `/collection/${id}`)
+---
+
+{
+  minimal ? (
+    <li class={className}>
+      <a
+        href={collectionUrl}
+        class='group flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-all hover:border-primary/50 hover:bg-muted/50 hover:shadow-sm'
+      >
+        <div class='flex flex-col gap-0.5 overflow-hidden'>
+          <span class='truncate font-medium text-foreground transition-colors group-hover:text-primary'>
+            {title}
+          </span>
+          {description && (
+            <span class='truncate text-xs text-muted-foreground'>{description}</span>
+          )}
+        </div>
+        <Icon
+          name='chevron-down'
+          class='size-4 -rotate-90 shrink-0 text-muted-foreground transition-colors group-hover:text-primary'
+        />
+      </a>
+    </li>
+  ) : (
+    <a
+      href={collectionUrl}
+      class={cn(
+        'group relative flex flex-col justify-between overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/50 hover:bg-muted/50 hover:shadow-md',
+        className
+      )}
+    >
+      <div class='flex flex-col'>
+        {data.heroImage ? (
+          <div class='group/img relative aspect-video w-full overflow-hidden'>
+            <Image
+              src={data.heroImage.src}
+              alt={data.heroImage.alt || title}
+              width={data.heroImage.width || 1200}
+              height={data.heroImage.height || 630}
+              class='h-full w-full object-cover transition-all duration-300 brightness-[0.8] group-hover/img:brightness-90'
+            />
+            <div class='absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4'>
+              <h2 class='line-clamp-2 text-xl font-semibold text-white'>{title}</h2>
+              {description && (
+                <p class='mt-1 line-clamp-2 text-sm text-white/80'>{description}</p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div class='flex flex-col gap-3 p-4'>
+            <div class='flex items-center justify-between'>
+              <Icon name='package' class='size-8 text-primary/80' />
+            </div>
+            <div class='flex flex-col gap-1'>
+              <h2 class='line-clamp-2 text-xl font-semibold transition-colors group-hover:text-primary'>
+                {title}
+              </h2>
+
+              {description && (
+                <p class='line-clamp-3 text-sm text-muted-foreground'>{description}</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div class='flex items-center justify-between p-4 text-sm font-medium text-primary'>
+        <span class='text-foreground transition-colors group-hover:text-primary'>
+          View Collection
+        </span>
+        <Icon
+          name='chevron-down'
+          class='size-5 -rotate-90 text-muted-foreground transition-colors group-hover:text-primary'
+        />
+      </div>
+    </a>
+  )
+}

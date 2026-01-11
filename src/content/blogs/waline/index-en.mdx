@@ -1,0 +1,46 @@
+---
+title: "Waline Comments: Deploy & Integrate"
+publishDate: 2026-01-11
+updatedDate: 2026-01-11
+description: Deploy the Waline server and enable comments/pageview in Axi Theme.
+category: tech
+tags:
+  - waline
+  - comments
+  - deployment
+language: en
+---
+
+## 1. Deploy Waline Server
+
+Follow the full walkthrough (server deployment + config explanation):
+
+- [Waline Comments: Deploy & Integrate](https://axi404.top/blog/waline-install)
+
+After deployment, you should get a server URL, e.g.:
+
+```txt
+https://waline.example.com/
+```
+
+## 2. Enable Waline in the Theme
+
+Edit `src/site.config.ts`:
+
+- `integ.waline.enable`: set to `true`
+- `integ.waline.server`: your Waline Server URL
+
+Example:
+
+```ts
+waline: {
+  enable: true,
+  server: 'https://waline.example.com/',
+}
+```
+
+## 3. Notes
+
+- Comment component: `src/components/advanced/Comment.astro`
+- Pageview/comment count: some pages load Waline `pageview` stats (see `src/pages/*`)
+- Per-post toggle: frontmatter `comment` (default `true`)
